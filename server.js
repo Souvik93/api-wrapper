@@ -56,11 +56,14 @@ request(options, function (error, response, body) {
 
 // var options = { method: 'POST',
 //   url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+//   rejectUnauthorized: false,
 //   headers:
 //    { 'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
 //      'cache-control': 'no-cache',
+//
 //      uniqueid: 'Capgemini999',
-//      authorization: 'Bearer MDWDpjK8QQOJYa4ONllewQ',
+//      //authorization:this.token_type+' '+this.token,
+//      // authorization: 'Bearer MDWDpjK8QQOJYa4ONllewQ',
 //      'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
 //   formData:
 //    { input_image:

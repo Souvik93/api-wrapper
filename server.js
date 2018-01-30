@@ -4,6 +4,10 @@ const http = require('http');
 const bodyParser = require('body-parser');
 const download = require('image-downloader')
 
+var resultOp;
+
+var set_attributes;
+
 
 
 // Get our API routes
@@ -83,14 +87,20 @@ app.get('/s', (req,res)=>
     if (error) throw new Error(error);
 
     //rpns=response;
-    console.log("Hi There!");
-    console.log(body);
+
+    resultOp=JSON.parse(body);
+
+    set_attributes.vehyear=resultOp[0].Note.make;
+    set_attributes.vehmake=resultOp[0].Note.model;
+    set_attributes.vehmodel=resultOp[0].Note.model;
+
+    res.send(set_attributes);
 
 
-    var jsonObj = JSON.parse(body);
-    console.log("Hi There2!");
-    console.log(jsonObj.Id);
-})
+//     var jsonObj = JSON.parse(body);
+//     console.log("Hi There2!");
+//     console.log(jsonObj.Id);
+ })
 });
 
 
@@ -159,13 +169,13 @@ request(options, function (error, response, body) {
     if (error) throw new Error(error);
 
     //rpns=response;
-    console.log("Hi There!");
-    console.log(body);
+    resultOp=JSON.parse(body);
 
+    set_attributes.vehyear=resultOp[0].Note.make;
+    set_attributes.vehmake=resultOp[0].Note.model;
+    set_attributes.vehmodel=resultOp[0].Note.model;
 
-    var jsonObj = JSON.parse(body);
-    console.log("Hi There2!");
-    console.log(jsonObj.Id);
+    res.send(set_attributes);
     //token_type=jsonObj.token_type;
 
 
@@ -185,7 +195,6 @@ request(options, function (error, response, body) {
 });
 
 
-res.send({'Done':'Done'});
 
 
 
@@ -200,7 +209,7 @@ res.send({'Done':'Done'});
 /**
  * Get port from environment and store in Express.
  */
-const port = process.env.PORT || '3008';
+const port = process.env.PORT || '3009';
 app.set('port', port);
 
 /**

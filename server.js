@@ -59,6 +59,39 @@ app.get ('/picimage', (req, res) => {
     })
 });
 
+app.get('/s', (req,res)=>
+{
+  var imgName="/dist/car.jpg";
+  var options = { method: 'POST',
+    url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+    rejectUnauthorized: false,
+    headers:
+     { 'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+       'cache-control': 'no-cache',
+
+       uniqueid: 'Capgemini999',
+       //authorization:token_type+' '+token,
+       authorization: 'Bearer _FMCfsEdSI-oq3o65GDepQ',
+       'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
+    formData:
+     { input_image:
+        { //value: fs.createReadStream(__dirname + imgName),
+          value: fs.createReadStream(__dirname + imgName),
+          options: { filename: 'car.jpg', contentType: null } } } };
+
+  request(options, function (error, response, body) {
+    if (error) throw new Error(error);
+
+    //rpns=response;
+    console.log("Hi There!");
+    console.log(body);
+
+
+    var jsonObj = JSON.parse(body);
+    console.log("Hi There2!");
+    console.log(jsonObj.Id);
+})
+});
 
 
 app.get('/p', (req, res) => {
@@ -104,8 +137,7 @@ request(options, function (error, response, body) {
   token_type=jsonObj.token_type;
   token=jsonObj.access_token;
   //console.log(token);
-console.log("Hello There");
-console.log(__dirname + imgName);
+
   var options = { method: 'POST',
     url: 'https://bapi-vs.blippar.com/v1/imageLookup',
     rejectUnauthorized: false,
@@ -127,10 +159,13 @@ console.log(__dirname + imgName);
     if (error) throw new Error(error);
 
     //rpns=response;
+    console.log("Hi There!");
     console.log(body);
 
+
     var jsonObj = JSON.parse(body);
-    console.log(jsonObj.Note);
+    console.log("Hi There2!");
+    console.log(jsonObj.Id);
     //token_type=jsonObj.token_type;
 
 
@@ -140,7 +175,6 @@ console.log(__dirname + imgName);
     //     return console.log(err);
     // }
 
-    console.log("The file was saved!");
 // });
 
   });
@@ -166,7 +200,7 @@ res.send({'Done':'Done'});
 /**
  * Get port from environment and store in Express.
  */
-const port = process.env.PORT || '3007';
+const port = process.env.PORT || '3008';
 app.set('port', port);
 
 /**

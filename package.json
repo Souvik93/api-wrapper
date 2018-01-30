@@ -4,6 +4,7 @@
   "description": "predicting car details using carimage",
   "main": "index.js",
   "scripts": {
+    "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Souvik Das",

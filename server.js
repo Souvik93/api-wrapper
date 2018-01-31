@@ -10,11 +10,6 @@ var token_type;
 
 var set_attributes={};
 
-
-
-// Get our API routes
-//const api = require('./server/routes/api');
-
 const app = express();
 
 // Parsers for POST data
@@ -26,17 +21,14 @@ app.use(express.static(path.join(__dirname, 'dist')));
 
 var fs = require("fs");
 var request = require("request");
-//app.use(express.static(path.join(__dirname, 'dist')));
 
-// Set our api routes
-//app.use('/api', api);
-
-// Catch all other routes and return the index file
-//var strm=__dirname + '/dist/Honda.jpg';
 var strm="https://img2.carmax.com/stock/mm-honda-accord/500";
+
+//Default Api
 app.get ('/', (req, res) => {
     res.send({"Status":"Welcome.. API up & running"});
 });
+
 
 app.get ('/getPrediction', (req, res) => {
 
@@ -55,49 +47,6 @@ app.get ('/getPrediction', (req, res) => {
     }).catch((err) => {
       throw err
     })
-});
-
-app.get('/chk', (req,res)=>
-{
-  var imgName="/dist/car.jpg";
-  var options = { method: 'POST',
-    url: 'https://bapi-vs.blippar.com/v1/imageLookup',
-    rejectUnauthorized: false,
-    headers:
-     { 'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
-       'cache-control': 'no-cache',
-
-       uniqueid: 'Capgemini999',
-       //authorization:token_type+' '+token,
-       authorization: 'Bearer 3XU_qnYVRYqsRCkbWI2z6A',
-       'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
-    formData:
-     { input_image:
-        { //value: fs.createReadStream(__dirname + imgName),
-          value: fs.createReadStream(__dirname + imgName),
-          options: { filename: 'car.jpg', contentType: null } } } };
-
-  request(options, function (error, response, body) {
-    //if (error) throw new Error(error);
-
-    if (error)
-    console.log(error);
-
-    //rpns=response;
-
-    resultOp=JSON.parse(body);
-
-    set_attributes.vehyear=resultOp[0].Note.make;
-    set_attributes.vehmake=resultOp[0].Note.model;
-    set_attributes.vehmodel=resultOp[0].Note.model;
-
-    res.send(set_attributes);
-
-
-//     var jsonObj = JSON.parse(body);
-//     console.log("Hi There2!");
-//     console.log(jsonObj.Id);
- })
 });
 
 
@@ -178,13 +127,14 @@ request(options, function (error, response, body) {
 });
 
 
+//Main Api Wrapper
 app.get('/getDetails', (req, res) => {
 var imgName="/dist/car.jpg";
 const options1 = {
   //url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
   url:req.query.imgurl,
   dest:  __dirname + imgName,
-  rejectUnauthorized: false       // Save to /path/to/dest/photo.jpg
+  rejectUnauthorized: false
 }
 
 download.image(options1)
@@ -207,7 +157,7 @@ download.image(options1)
       'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
    formData:
     { input_image:
-       { //value: fs.createReadStream(__dirname + imgName),
+       {
          value: fs.createReadStream(__dirname + imgName),
          options: { filename: 'car.jpg', contentType: null } } } };
 
@@ -248,7 +198,7 @@ download.image(options1)
             'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
          formData:
           { input_image:
-             { //value: fs.createReadStream(__dirname + imgName),
+             {
                value: fs.createReadStream(__dirname + imgName),
                options: { filename: 'car.jpg', contentType: null } } } };
        request(options, function (error, response, body) {
@@ -285,11 +235,6 @@ download.image(options1)
 
 });
 
-/**
- * Get port from environment and store in Express.
- */
-
-
  function getToken()
  {
    console.log("Token Initialized");
@@ -314,8 +259,11 @@ download.image(options1)
    });
 
  }
+
+//Get port from environment and store in Express.
 const port = process.env.PORT || '3009';
 app.set('port', port);
+//Initialize Token Type & Token No
 getToken();
 
 /**

@@ -5,8 +5,10 @@ const bodyParser = require('body-parser');
 const download = require('image-downloader')
 
 var resultOp;
+var token;
+var token_type;
 
-var set_attributes;
+var set_attributes={};
 
 
 
@@ -32,25 +34,17 @@ var request = require("request");
 // Catch all other routes and return the index file
 //var strm=__dirname + '/dist/Honda.jpg';
 var strm="https://img2.carmax.com/stock/mm-honda-accord/500";
-app.get ('/image', (req, res) => {
-    let readStream = fs.createReadStream(__dirname + '/dist/p.jpg')
-
-    // When the stream is done being read, end the response
-    readStream.on('close', () => {
-        res.end()
-    })
-
-    // Stream chunks to response
-    readStream.pipe(res)
+app.get ('/', (req, res) => {
+    res.send({"Status":"Welcome.. API up & running"});
 });
 
-app.get ('/picimage', (req, res) => {
-  var token;
-  var token_type;
+app.get ('/getPrediction', (req, res) => {
+
   var imgName="/dist/car.jpg";
   // '/path/to/dest/photo.jpg'
   const options1 = {
-    url: 'https://www.cstatic-images.com/stock/900x600/1402518103458.jpg',
+    //url: 'https://www.cstatic-images.com/stock/900x600/1402518103458.jpg',
+    url:req.query.imgurl,
     dest:  __dirname + imgName,
     rejectUnauthorized: false       // Save to /path/to/dest/photo.jpg
   }
@@ -63,7 +57,7 @@ app.get ('/picimage', (req, res) => {
     })
 });
 
-app.get('/s', (req,res)=>
+app.get('/chk', (req,res)=>
 {
   var imgName="/dist/car.jpg";
   var options = { method: 'POST',
@@ -75,7 +69,7 @@ app.get('/s', (req,res)=>
 
        uniqueid: 'Capgemini999',
        //authorization:token_type+' '+token,
-       authorization: 'Bearer _FMCfsEdSI-oq3o65GDepQ',
+       authorization: 'Bearer 3XU_qnYVRYqsRCkbWI2z6A',
        'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
     formData:
      { input_image:
@@ -84,7 +78,10 @@ app.get('/s', (req,res)=>
           options: { filename: 'car.jpg', contentType: null } } } };
 
   request(options, function (error, response, body) {
-    if (error) throw new Error(error);
+    //if (error) throw new Error(error);
+
+    if (error)
+    console.log(error);
 
     //rpns=response;
 
@@ -104,18 +101,17 @@ app.get('/s', (req,res)=>
 });
 
 
-app.get('/p', (req, res) => {
+app.get('/getCarDetails', (req, res) => {
 
-  console.log("Hello There From Api");
+  //console.log("Hello There From Api");
 
 var rpns;
 
-var token;
-var token_type;
 var imgName="/dist/car.jpg";
 // '/path/to/dest/photo.jpg'
 const options1 = {
-  url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
+  //url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
+  url:req.query.imgurl,
   dest:  __dirname + imgName,
   rejectUnauthorized: false       // Save to /path/to/dest/photo.jpg
 }
@@ -168,7 +164,6 @@ request(options, function (error, response, body) {
   request(options, function (error, response, body) {
     if (error) throw new Error(error);
 
-    //rpns=response;
     resultOp=JSON.parse(body);
 
     set_attributes.vehyear=resultOp[0].Note.make;
@@ -176,41 +171,152 @@ request(options, function (error, response, body) {
     set_attributes.vehmodel=resultOp[0].Note.model;
 
     res.send(set_attributes);
-    //token_type=jsonObj.token_type;
 
-
-
-    // fs.writeFile( "/", response, function(err) {
-    // if(err) {
-    //     return console.log(err);
-    // }
-
-// });
 
   });
-
-
-
-
+});
 });
 
 
+app.get('/getDetails', (req, res) => {
+var imgName="/dist/car.jpg";
+const options1 = {
+  //url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
+  url:req.query.imgurl,
+  dest:  __dirname + imgName,
+  rejectUnauthorized: false       // Save to /path/to/dest/photo.jpg
+}
+
+download.image(options1)
+  .then(({ filename, image }) => {
+    console.log('File saved to', filename)
+  }).catch((err) => {
+    throw err
+  })
 
 
+ var options = { method: 'POST',
+   url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+   rejectUnauthorized: false,
+   headers:
+    { 'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+      'cache-control': 'no-cache',
+      uniqueid: 'Capgemini999',
+      //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
+        authorization:token_type+' '+token,
+      'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
+   formData:
+    { input_image:
+       { //value: fs.createReadStream(__dirname + imgName),
+         value: fs.createReadStream(__dirname + imgName),
+         options: { filename: 'car.jpg', contentType: null } } } };
 
+ request(options, function (error, response, body) {
+   if (error)
+   console.log(error);
+   resultOp=JSON.parse(body);
 
+   if(resultOp.status!=undefined && resultOp.error.code==605)
+   {
+     var options = { method: 'GET',
+       url: 'https://bauth.blippar.com/token',
+       rejectUnauthorized: false,
+       qs:
+        { grant_type: 'client_credentials',
+          client_id: 'd0e925cea1264c10b6e0cc50107c9d3f',
+          client_secret: '4f34a589116a4d42a1d7df2bc40d053c' },
+       headers:
+        {
+          'cache-control': 'no-cache' } };
 
+     request(options, function (error, response, body) {
+       if (error) throw new Error(error);
+       var jsonObj = JSON.parse(body);
+       console.log(jsonObj.token_type);
+       token_type=jsonObj.token_type;
+       token=jsonObj.access_token;
+       var options = { method: 'POST',
+         url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+         rejectUnauthorized: false,
+         headers:
+          { 'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+            'cache-control': 'no-cache',
 
+            uniqueid: 'Capgemini999',
+            authorization:token_type+' '+token,
+            //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
+            'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW' },
+         formData:
+          { input_image:
+             { //value: fs.createReadStream(__dirname + imgName),
+               value: fs.createReadStream(__dirname + imgName),
+               options: { filename: 'car.jpg', contentType: null } } } };
+       request(options, function (error, response, body) {
+           resultOp=JSON.parse(body);
+           console.log("Hiiii");
+           console.log(resultOp);
+         if (error) throw new Error(error);
 
+          if(resultOp.status!=undefined)
+          {
+            res.send({"Status":"Failed"});
+          }
+         else {
 
+           set_attributes.vehyear=resultOp[0].Note.make;
+           set_attributes.vehmake=resultOp[0].Note.model;
+           set_attributes.vehmodel=resultOp[0].Note.yeargroup;
+           res.send(set_attributes);
+         }
+
+       });
+
+     });
+   }
+   else {
+     set_attributes.vehyear=resultOp[0].Note.make;
+     set_attributes.vehmake=resultOp[0].Note.model;
+     set_attributes.vehmodel=resultOp[0].Note.yeargroup;
+
+     res.send(set_attributes);
+   }
+
+ });
 
 });
 
 /**
  * Get port from environment and store in Express.
  */
+
+
+ function getToken()
+ {
+   console.log("Token Initialized");
+   var options = { method: 'GET',
+     url: 'https://bauth.blippar.com/token',
+     rejectUnauthorized: false,
+     qs:
+      { grant_type: 'client_credentials',
+        client_id: 'd0e925cea1264c10b6e0cc50107c9d3f',
+        client_secret: '4f34a589116a4d42a1d7df2bc40d053c' },
+     headers:
+      {
+        'cache-control': 'no-cache' } };
+
+   request(options, function (error, response, body) {
+     if (error) throw new Error(error);
+     var jsonObj = JSON.parse(body);
+     console.log(jsonObj.token_type);
+     token_type=jsonObj.token_type;
+     token=jsonObj.access_token;
+     //console.log(token);
+   });
+
+ }
 const port = process.env.PORT || '3009';
 app.set('port', port);
+getToken();
 
 /**
  * Create HTTP server.

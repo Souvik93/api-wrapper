@@ -10,6 +10,8 @@ var token_type;
 
 var set_attributes={};
 
+var responseObject={};
+
 const app = express();
 
 // Parsers for POST data
@@ -216,7 +218,7 @@ download.image(options1)
            set_attributes.vehyear=resultOp[0].Note.make;
            set_attributes.vehmake=resultOp[0].Note.model;
            set_attributes.vehmodel=resultOp[0].Note.yeargroup;
-           res.send(set_attributes);
+           res.send(responseObject.set_attributes);
          }
 
        });
@@ -224,11 +226,11 @@ download.image(options1)
      });
    }
    else {
-     set_attributes.set_attributes.vehyear=resultOp[0].Note.make;
-     set_attributes.set_attributes.vehmake=resultOp[0].Note.model;
-     set_attributes.set_attributes.vehmodel=resultOp[0].Note.yeargroup;
+     set_attributes.vehyear=resultOp[0].Note.make;
+     set_attributes.vehmake=resultOp[0].Note.model;
+     set_attributes.vehmodel=resultOp[0].Note.yeargroup;
 
-     res.send(set_attributes);
+     res.send(responseObject.set_attributes);
    }
 
  });

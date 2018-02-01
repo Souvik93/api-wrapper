@@ -67,6 +67,8 @@ app.get('/getDetails', (req, res) => {
         url: req.query.imgurl,
         dest: __dirname + imgName,
         rejectUnauthorized: false
+
+
     }
 
     download.image(options1)
@@ -74,110 +76,115 @@ app.get('/getDetails', (req, res) => {
             filename, image
         }) => {
             console.log('File saved to', filename)
+
+            var options = {
+                method: 'POST',
+                url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+                rejectUnauthorized: false,
+                headers: {
+                    'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+                    'cache-control': 'no-cache',
+                    uniqueid: 'Capgemini999',
+                    //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
+                    authorization: token_type + ' ' + token,
+                    'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+                },
+                formData: {
+                    input_image: {
+                        value: fs.createReadStream(__dirname + imgName),
+                        options: {
+                            filename: 'car.jpg',
+                            contentType: null
+                        }
+                    }
+                }
+            };
+
+            request(options, function(error, response, body) {
+                if (error)
+                    console.log(error);
+                resultOp = JSON.parse(body);
+
+                if (resultOp.status != undefined && resultOp.error.code == 605) {
+                    var options = {
+                        method: 'GET',
+                        url: 'https://bauth.blippar.com/token',
+                        rejectUnauthorized: false,
+                        qs: {
+                            grant_type: 'client_credentials',
+                            client_id: 'd0e925cea1264c10b6e0cc50107c9d3f',
+                            client_secret: '4f34a589116a4d42a1d7df2bc40d053c'
+                        },
+                        headers: {
+                            'cache-control': 'no-cache'
+                        }
+                    };
+
+                    request(options, function(error, response, body) {
+                        if (error) throw new Error(error);
+                        var jsonObj = JSON.parse(body);
+                        console.log(jsonObj.token_type);
+                        token_type = jsonObj.token_type;
+                        token = jsonObj.access_token;
+                        var options = {
+                            method: 'POST',
+                            url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+                            rejectUnauthorized: false,
+                            headers: {
+                                'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+                                'cache-control': 'no-cache',
+
+                                uniqueid: 'Capgemini999',
+                                authorization: token_type + ' ' + token,
+                                //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
+                                'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+                            },
+                            formData: {
+                                input_image: {
+                                    value: fs.createReadStream(__dirname + imgName),
+                                    options: {
+                                        filename: 'car.jpg',
+                                        contentType: null
+                                    }
+                                }
+                            }
+                        };
+                        request(options, function(error, response, body) {
+                            resultOp = JSON.parse(body);
+                            console.log(resultOp);
+                            if (error) throw new Error(error);
+
+                            if (resultOp.status != undefined) {
+                                res.send({
+                                    "Status": "Failed"
+                                });
+                            } else {
+                                set_attributes.vehyear = resultOp[0].Note.yeargroup;
+                                set_attributes.vehmake = resultOp[0].Note.make;
+                                set_attributes.vehmodel = resultOp[0].Note.model;
+                                responseObject.set_attributes = set_attributes;
+                                res.send(responseObject);
+                            }
+                        });
+                    });
+                } else {
+                    set_attributes.vehyear = resultOp[0].Note.yeargroup;
+                    set_attributes.vehmake = resultOp[0].Note.make;
+                    set_attributes.vehmodel = resultOp[0].Note.model;
+                    responseObject.set_attributes = set_attributes;
+                    res.send(responseObject);
+                }
+
+
+          })
+
+
         }).catch((err) => {
             throw err
         })
 
 
-    var options = {
-        method: 'POST',
-        url: 'https://bapi-vs.blippar.com/v1/imageLookup',
-        rejectUnauthorized: false,
-        headers: {
-            'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
-            'cache-control': 'no-cache',
-            uniqueid: 'Capgemini999',
-            //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
-            authorization: token_type + ' ' + token,
-            'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
-        },
-        formData: {
-            input_image: {
-                value: fs.createReadStream(__dirname + imgName),
-                options: {
-                    filename: 'car.jpg',
-                    contentType: null
-                }
-            }
-        }
-    };
 
-    request(options, function(error, response, body) {
-        if (error)
-            console.log(error);
-        resultOp = JSON.parse(body);
-
-        if (resultOp.status != undefined && resultOp.error.code == 605) {
-            var options = {
-                method: 'GET',
-                url: 'https://bauth.blippar.com/token',
-                rejectUnauthorized: false,
-                qs: {
-                    grant_type: 'client_credentials',
-                    client_id: 'd0e925cea1264c10b6e0cc50107c9d3f',
-                    client_secret: '4f34a589116a4d42a1d7df2bc40d053c'
-                },
-                headers: {
-                    'cache-control': 'no-cache'
-                }
-            };
-
-            request(options, function(error, response, body) {
-                if (error) throw new Error(error);
-                var jsonObj = JSON.parse(body);
-                console.log(jsonObj.token_type);
-                token_type = jsonObj.token_type;
-                token = jsonObj.access_token;
-                var options = {
-                    method: 'POST',
-                    url: 'https://bapi-vs.blippar.com/v1/imageLookup',
-                    rejectUnauthorized: false,
-                    headers: {
-                        'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
-                        'cache-control': 'no-cache',
-
-                        uniqueid: 'Capgemini999',
-                        authorization: token_type + ' ' + token,
-                        //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
-                        'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
-                    },
-                    formData: {
-                        input_image: {
-                            value: fs.createReadStream(__dirname + imgName),
-                            options: {
-                                filename: 'car.jpg',
-                                contentType: null
-                            }
-                        }
-                    }
-                };
-                request(options, function(error, response, body) {
-                    resultOp = JSON.parse(body);
-                    console.log(resultOp);
-                    if (error) throw new Error(error);
-
-                    if (resultOp.status != undefined) {
-                        res.send({
-                            "Status": "Failed"
-                        });
-                    } else {
-                        set_attributes.vehyear = resultOp[0].Note.yeargroup;
-                        set_attributes.vehmake = resultOp[0].Note.make;
-                        set_attributes.vehmodel = resultOp[0].Note.model;
-                        responseObject.set_attributes = set_attributes;
-                        res.send(responseObject);
-                    }
-                });
-            });
-        } else {
-            set_attributes.vehyear = resultOp[0].Note.yeargroup;
-            set_attributes.vehmake = resultOp[0].Note.make;
-            set_attributes.vehmodel = resultOp[0].Note.model;
-            responseObject.set_attributes = set_attributes;
-            res.send(responseObject);
-        }
-
-    });
 
 });
 

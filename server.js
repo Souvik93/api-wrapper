@@ -160,8 +160,8 @@ app.get('/getDetails', (req, res) => {
                                 });
                             } else {
                                 set_attributes.vehyear = resultOp[0].Note.yeargroup;
-                                set_attributes.vehmake = resultOp[0].Note.make;
-                                set_attributes.vehmodel = resultOp[0].Note.model;
+                                set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
+                                set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
                                 responseObject.set_attributes = set_attributes;
                                 res.send(responseObject);
                             }
@@ -169,8 +169,8 @@ app.get('/getDetails', (req, res) => {
                     });
                 } else {
                     set_attributes.vehyear = resultOp[0].Note.yeargroup;
-                    set_attributes.vehmake = resultOp[0].Note.make;
-                    set_attributes.vehmodel = resultOp[0].Note.model;
+                    set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
+                    set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
                     responseObject.set_attributes = set_attributes;
                     res.send(responseObject);
                 }
@@ -180,7 +180,10 @@ app.get('/getDetails', (req, res) => {
 
 
         }).catch((err) => {
-            throw err
+          console.log(err);
+          res.send({
+              "Status": "Unable To Download Image"
+          });
         })
 
 

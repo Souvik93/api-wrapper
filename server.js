@@ -217,9 +217,9 @@ download.image(options1)
 
 
 
-           set_attributes.vehyear=resultOp[0].Note.make;
-           set_attributes.vehmake=resultOp[0].Note.model;
-           set_attributes.vehmodel=resultOp[0].Note.yeargroup;
+           set_attributes.vehyear=resultOp[0].Note.yeargroup;
+           set_attributes.vehmake=resultOp[0].Note.make;
+           set_attributes.vehmodel=resultOp[0].Note.model;
            responseObject.set_attributes=set_attributes;
            res.send(responseObject);
          }
@@ -229,9 +229,9 @@ download.image(options1)
      });
    }
    else {
-     set_attributes.vehyear=resultOp[0].Note.make;
-     set_attributes.vehmake=resultOp[0].Note.model;
-     set_attributes.vehmodel=resultOp[0].Note.yeargroup;
+     set_attributes.vehyear=resultOp[0].Note.yeargroup;
+     set_attributes.vehmake=resultOp[0].Note.make;
+     set_attributes.vehmodel=resultOp[0].Note.model;
      responseObject.set_attributes=set_attributes;
      res.send(responseObject);
    }

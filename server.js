@@ -61,9 +61,10 @@ app.get('/img',(req,res)=>
 // })
 
 download2('https://img2.carmax.com/stock/mm-honda-accord/500').then(data => {
-	fs.writeFileSync('dist/foo.jpg', data);
+	fs.writeFileSync('dist/car.jpg', data);
+  res.send({"done":"done"})
 });
-  res.send({})
+
 })
 
 app.get('/getPrediction', (req, res) => {
@@ -253,7 +254,7 @@ function getToken() {
 const port = process.env.PORT || '3009';
 app.set('port', port);
 //Initialize Token Type & Token No
-//getToken();
+getToken();
 
 /**
  * Create HTTP server.

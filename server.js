@@ -32,7 +32,7 @@ app.use(bodyParser.urlencoded({
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
 
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 app.use(bodyParser.json());
 
@@ -72,11 +72,6 @@ download2('https://scontent-ort2-2.xx.fbcdn.net/v/t34.0-12/27658283_157183141736
 app.get('/getPrediction', (req, res) => {
 
     var imgName = "/dist/car.jpg";
-
-
-
-
-
     // '/path/to/dest/photo.jpg'
     const options1 = {
         //url: 'https://www.cstatic-images.com/stock/900x600/1402518103458.jpg',
@@ -102,10 +97,8 @@ app.post('/getDetails', (req, res) => {
       rejectUnauthorized: false
   }
 
-  console.log(req.body.imgurl);
-  //log("Hi");
-  console.log(req.body.imgurl);
   download2(req.body.imgurl,options2).then(data => {
+
     fs.writeFileSync('dist/car.jpg', data);
 
 
@@ -155,7 +148,7 @@ app.post('/getDetails', (req, res) => {
             request(options, function(error, response, body) {
                 if (error) throw new Error(error);
                 var jsonObj = JSON.parse(body);
-                console.log(jsonObj.token_type);
+                //console.log(jsonObj.token_type);
                 token_type = jsonObj.token_type;
                 token = jsonObj.access_token;
                 var options = {
@@ -201,17 +194,23 @@ app.post('/getDetails', (req, res) => {
                 });
             });
         } else {
+            console.log(body.length);
             set_attributes.vehyear = resultOp[0].Note.yeargroup;
             set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
             set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
             responseObject.set_attributes = set_attributes;
             res.send(responseObject);
         }
-
-
   })
+  }
+)
 
-  });
+.catch((err) => {
+       //console.log(err);
+      res.send({
+          "Status": "Unable To Download Image"
+      });
+   });
 
 
   console.log(req.body.imgurl);

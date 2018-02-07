@@ -4,7 +4,14 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const bodyParser = require('body-parser');
-const download = require('image-downloader')
+const download = require('image-downloader');
+
+const download2 = require('download');
+
+
+var download1 = require('download-file');
+
+var furl = "http://i.imgur.com/G9bDaPH.jpg";
 
 var resultOp;
 var token;
@@ -25,6 +32,10 @@ app.use(bodyParser.urlencoded({
 // Point static path to dist
 app.use(express.static(path.join(__dirname, 'dist')));
 
+app.use(bodyParser.urlencoded({ extended: false }));
+
+app.use(bodyParser.json());
+
 var fs = require("fs");
 var request = require("request");
 
@@ -37,6 +48,23 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/img',(req,res)=>
+{
+//   var options = {
+//     directory: "/dist/",
+//     filename: "cat.jpg"
+// }
+//
+// download1(furl, options, function(err){
+//     if (err)
+//     console.log(err)
+// })
+
+download2('https://img2.carmax.com/stock/mm-honda-accord/500').then(data => {
+	fs.writeFileSync('dist/foo.jpg', data);
+});
+  res.send({})
+})
 
 app.get('/getPrediction', (req, res) => {
 
@@ -60,11 +88,13 @@ app.get('/getPrediction', (req, res) => {
 });
 
 //Main Api Wrapper
-app.get('/getDetails', (req, res) => {
+app.post('/getDetails', (req, res) => {
+  console.log(req.body.imgurl);
     var imgName = "/dist/car.jpg";
     const options1 = {
         //url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
-        url: req.query.imgurl,
+        //url: req.query.imgurl,
+        url: req.body.imgurl,
         dest: __dirname + imgName,
         rejectUnauthorized: false
 
@@ -159,6 +189,7 @@ app.get('/getDetails', (req, res) => {
                                     "Status": "Failed"
                                 });
                             } else {
+                              console.log(body.length);
                                 set_attributes.vehyear = resultOp[0].Note.yeargroup;
                                 set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
                                 set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
@@ -222,7 +253,7 @@ function getToken() {
 const port = process.env.PORT || '3009';
 app.set('port', port);
 //Initialize Token Type & Token No
-getToken();
+//getToken();
 
 /**
  * Create HTTP server.

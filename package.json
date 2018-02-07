@@ -9,6 +9,8 @@
   "author": "Souvik Das",
   "license": "ISC",
   "dependencies": {
+    "download": "^6.2.5",
+    "download-file": "^0.1.5",
     "express": "^4.16.2",
     "image-downloader": "^3.3.0",
     "nodemon": "^1.14.11",

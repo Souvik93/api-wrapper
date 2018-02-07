@@ -101,9 +101,13 @@ app.post('/getDetails', (req, res) => {
   var options2={
       rejectUnauthorized: false
   }
+
+  console.log(req.body.imgurl);
+  //log("Hi");
+  console.log(req.body.imgurl);
   download2(req.body.imgurl,options2).then(data => {
     fs.writeFileSync('dist/car.jpg', data);
-    
+
 
     var options = {
         method: 'POST',

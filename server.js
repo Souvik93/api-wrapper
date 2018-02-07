@@ -59,8 +59,10 @@ app.get('/img',(req,res)=>
 //     if (err)
 //     console.log(err)
 // })
-
-download2('https://img2.carmax.com/stock/mm-honda-accord/500').then(data => {
+var options={
+    rejectUnauthorized: false
+}
+download2('https://scontent-ort2-2.xx.fbcdn.net/v/t34.0-12/27658283_157183141736009_2121272733_n.jpg',options).then(data => {
 	fs.writeFileSync('dist/car.jpg', data);
   res.send({"done":"done"})
 });
@@ -70,6 +72,11 @@ download2('https://img2.carmax.com/stock/mm-honda-accord/500').then(data => {
 app.get('/getPrediction', (req, res) => {
 
     var imgName = "/dist/car.jpg";
+
+
+
+
+
     // '/path/to/dest/photo.jpg'
     const options1 = {
         //url: 'https://www.cstatic-images.com/stock/900x600/1402518103458.jpg',
@@ -90,133 +97,144 @@ app.get('/getPrediction', (req, res) => {
 
 //Main Api Wrapper
 app.post('/getDetails', (req, res) => {
-  console.log(req.body.imgurl);
-    var imgName = "/dist/car.jpg";
-    const options1 = {
-        //url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
-        //url: req.query.imgurl,
-        url: req.body.imgurl,
-        dest: __dirname + imgName,
-        rejectUnauthorized: false
 
+  var options2={
+      rejectUnauthorized: false
+  }
+  download2(req.body.imgurl,options2).then(data => {
+    fs.writeFileSync('dist/car.jpg', data);
+    res.send({"done":"done"})
 
-    }
+    var options = {
+        method: 'POST',
+        url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+        rejectUnauthorized: false,
+        headers: {
+            'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+            'cache-control': 'no-cache',
+            uniqueid: 'Capgemini999',
+            //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
+            authorization: token_type + ' ' + token,
+            'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+        },
+        formData: {
+            input_image: {
+                value: fs.createReadStream(__dirname + imgName),
+                options: {
+                    filename: 'car.jpg',
+                    contentType: null
+                }
+            }
+        }
+    };
 
-    download.image(options1)
-        .then(({
-            filename, image
-        }) => {
-            console.log('File saved to', filename)
+    request(options, function(error, response, body) {
+        if (error)
+            console.log(error);
+        resultOp = JSON.parse(body);
 
+        if (resultOp.status != undefined && resultOp.error.code == 605) {
             var options = {
-                method: 'POST',
-                url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+                method: 'GET',
+                url: 'https://bauth.blippar.com/token',
                 rejectUnauthorized: false,
-                headers: {
-                    'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
-                    'cache-control': 'no-cache',
-                    uniqueid: 'Capgemini999',
-                    //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
-                    authorization: token_type + ' ' + token,
-                    'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+                qs: {
+                    grant_type: 'client_credentials',
+                    client_id: 'd0e925cea1264c10b6e0cc50107c9d3f',
+                    client_secret: '4f34a589116a4d42a1d7df2bc40d053c'
                 },
-                formData: {
-                    input_image: {
-                        value: fs.createReadStream(__dirname + imgName),
-                        options: {
-                            filename: 'car.jpg',
-                            contentType: null
-                        }
-                    }
+                headers: {
+                    'cache-control': 'no-cache'
                 }
             };
 
             request(options, function(error, response, body) {
-                if (error)
-                    console.log(error);
-                resultOp = JSON.parse(body);
+                if (error) throw new Error(error);
+                var jsonObj = JSON.parse(body);
+                console.log(jsonObj.token_type);
+                token_type = jsonObj.token_type;
+                token = jsonObj.access_token;
+                var options = {
+                    method: 'POST',
+                    url: 'https://bapi-vs.blippar.com/v1/imageLookup',
+                    rejectUnauthorized: false,
+                    headers: {
+                        'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
+                        'cache-control': 'no-cache',
 
-                if (resultOp.status != undefined && resultOp.error.code == 605) {
-                    var options = {
-                        method: 'GET',
-                        url: 'https://bauth.blippar.com/token',
-                        rejectUnauthorized: false,
-                        qs: {
-                            grant_type: 'client_credentials',
-                            client_id: 'd0e925cea1264c10b6e0cc50107c9d3f',
-                            client_secret: '4f34a589116a4d42a1d7df2bc40d053c'
-                        },
-                        headers: {
-                            'cache-control': 'no-cache'
+                        uniqueid: 'Capgemini999',
+                        authorization: token_type + ' ' + token,
+                        //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
+                        'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
+                    },
+                    formData: {
+                        input_image: {
+                            value: fs.createReadStream(__dirname + imgName),
+                            options: {
+                                filename: 'car.jpg',
+                                contentType: null
+                            }
                         }
-                    };
+                    }
+                };
+                request(options, function(error, response, body) {
+                    resultOp = JSON.parse(body);
+                    console.log(resultOp);
+                    if (error) throw new Error(error);
 
-                    request(options, function(error, response, body) {
-                        if (error) throw new Error(error);
-                        var jsonObj = JSON.parse(body);
-                        console.log(jsonObj.token_type);
-                        token_type = jsonObj.token_type;
-                        token = jsonObj.access_token;
-                        var options = {
-                            method: 'POST',
-                            url: 'https://bapi-vs.blippar.com/v1/imageLookup',
-                            rejectUnauthorized: false,
-                            headers: {
-                                'postman-token': '7a60f864-ce31-09f4-0d80-74e19a9d0892',
-                                'cache-control': 'no-cache',
-
-                                uniqueid: 'Capgemini999',
-                                authorization: token_type + ' ' + token,
-                                //authorization: 'Bearer 9b-NCyWYQ1eL7WWtNiaPtA',
-                                'content-type': 'multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW'
-                            },
-                            formData: {
-                                input_image: {
-                                    value: fs.createReadStream(__dirname + imgName),
-                                    options: {
-                                        filename: 'car.jpg',
-                                        contentType: null
-                                    }
-                                }
-                            }
-                        };
-                        request(options, function(error, response, body) {
-                            resultOp = JSON.parse(body);
-                            console.log(resultOp);
-                            if (error) throw new Error(error);
-
-                            if (resultOp.status != undefined) {
-                                res.send({
-                                    "Status": "Failed"
-                                });
-                            } else {
-                              console.log(body.length);
-                                set_attributes.vehyear = resultOp[0].Note.yeargroup;
-                                set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
-                                set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
-                                responseObject.set_attributes = set_attributes;
-                                res.send(responseObject);
-                            }
+                    if (resultOp.status != undefined) {
+                        res.send({
+                            "Status": "Failed"
                         });
-                    });
-                } else {
-                    set_attributes.vehyear = resultOp[0].Note.yeargroup;
-                    set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
-                    set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
-                    responseObject.set_attributes = set_attributes;
-                    res.send(responseObject);
-                }
+                    } else {
+                      console.log(body.length);
+                        set_attributes.vehyear = resultOp[0].Note.yeargroup;
+                        set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
+                        set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
+                        responseObject.set_attributes = set_attributes;
+                        res.send(responseObject);
+                    }
+                });
+            });
+        } else {
+            set_attributes.vehyear = resultOp[0].Note.yeargroup;
+            set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
+            set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
+            responseObject.set_attributes = set_attributes;
+            res.send(responseObject);
+        }
 
 
-          })
+  })
+
+  });
 
 
-        }).catch((err) => {
-          console.log(err);
-          res.send({
-              "Status": "Unable To Download Image"
-          });
-        })
+  console.log(req.body.imgurl);
+    var imgName = "/dist/car.jpg";
+    // const options1 = {
+    //     //url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg/1200px-2014_Honda_Accord_2.4_i-VTEC_sedan_%282016-01-07%29_01.jpg',
+    //     //url: req.query.imgurl,
+    //     url: req.body.imgurl,
+    //     dest: __dirname + imgName,
+    //     rejectUnauthorized: false
+    //
+    //
+    // }
+
+    // download.image(options1)
+    //     .then(({
+    //         filename, image
+    //     }) => {
+    //         console.log('File saved to', filename)
+    //
+    //
+    //     }).catch((err) => {
+    //       console.log(err);
+    //       res.send({
+    //           "Status": "Unable To Download Image"
+    //       });
+    //     })
 
 
 

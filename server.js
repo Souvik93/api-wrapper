@@ -103,7 +103,7 @@ app.post('/getDetails', (req, res) => {
   }
   download2(req.body.imgurl,options2).then(data => {
     fs.writeFileSync('dist/car.jpg', data);
-    res.send({"done":"done"})
+    
 
     var options = {
         method: 'POST',

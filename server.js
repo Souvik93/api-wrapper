@@ -199,6 +199,7 @@ app.post('/getDetails', (req, res) => {
             });
         } else {
             console.log(body.length);
+	    set_attributes.jsonAPIError="No";
             set_attributes.vehyear = resultOp[0].Note.yeargroup;
             set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
             set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();

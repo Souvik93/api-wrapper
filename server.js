@@ -86,7 +86,9 @@ app.get('/getPrediction', (req, res) => {
         }) => {
             console.log('File saved to', filename)
         }).catch((err) => {
-            throw err
+            set_attributes.jsonAPIError="Yes";
+	    responseObject.set_attributes = set_attributes;
+            res.send(responseObject);
         })
 });
 
@@ -126,8 +128,9 @@ app.post('/getDetails', (req, res) => {
     };
 
     request(options, function(error, response, body) {
-        if (error)
-            console.log(error);
+        if (error){  set_attributes.jsonAPIError="Yes";
+			    responseObject.set_attributes = set_attributes;
+                        res.send(responseObject);}
         resultOp = JSON.parse(body);
 
         if (resultOp.status != undefined && resultOp.error.code == 605) {
@@ -180,11 +183,12 @@ app.post('/getDetails', (req, res) => {
                     if (error) throw new Error(error);
 
                     if (resultOp.status != undefined) {
-                        res.send({
-                            "Status": "Failed"
-                        });
+			    set_attributes.jsonAPIError="Yes";
+			    responseObject.set_attributes = set_attributes;
+                        res.send(responseObject);
                     } else {
                       console.log(body.length);
+			set_attributes.jsonAPIError="No";
                         set_attributes.vehyear = resultOp[0].Note.yeargroup;
                         set_attributes.vehmake = resultOp[0].Note.make.toUpperCase();
                         set_attributes.vehmodel = resultOp[0].Note.model.toUpperCase();
@@ -207,9 +211,9 @@ app.post('/getDetails', (req, res) => {
 
 .catch((err) => {
        //console.log(err);
-      res.send({
-          "Status": "Unable To Download Image"
-      });
+       set_attributes.jsonAPIError="Yes";
+       responseObject.set_attributes = set_attributes;
+       res.send(responseObject);
    });
 
 
